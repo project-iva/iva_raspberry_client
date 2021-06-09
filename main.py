@@ -1,5 +1,7 @@
 import asyncio
 import websockets
+from dotenv import load_dotenv
+
 from websocket_message import RaspberryWebSocketMessage, RaspberrySocketMessageAction
 import os
 
@@ -25,12 +27,13 @@ def handle_message(message: RaspberryWebSocketMessage):
 
 
 async def handle_websocket():
-    uri = "ws://localhost:5678/raspberry"
-    async with websockets.connect(uri) as websocket:
+    iva_websocket_uri = os.environ.get('IVA_WEBSOCKET_URI')
+    async with websockets.connect(iva_websocket_uri) as websocket:
         async for message in websocket:
             message = RaspberryWebSocketMessage.from_json(message)
             handle_message(message)
 
 
 if __name__ == '__main__':
+    load_dotenv()
     asyncio.get_event_loop().run_until_complete(handle_websocket())
