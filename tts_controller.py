@@ -18,6 +18,6 @@ class TTSController:
         dispatcher[action](text)
 
     def say(self, text: str):
-        print('saying ', text)
+        print(f'saying "{text}"')
         self.tts_engine.say(text)
         self.tts_engine.runAndWait()
