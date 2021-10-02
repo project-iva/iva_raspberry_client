@@ -2,6 +2,7 @@ from http.server import HTTPServer, BaseHTTPRequestHandler
 from urllib.parse import parse_qs
 
 from screen_controller import ScreenController
+from tts_controller import TTSController
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -23,12 +24,23 @@ class Handler(BaseHTTPRequestHandler):
             else:
                 ScreenController.handle_action(screen_action)
 
+            try:
+                tts_action = TTSController.Action(action)
+            except ValueError:
+                pass
+            else:
+                tts_data = post_data.get('tts_data')
+                if tts_data and len(tts_data) == 1:
+                    text = tts_data[0]
+                    self.server.tts_controller.handle_action(tts_action, text)
+
         self._set_headers()
 
 
-def run_server(address='localhost', port=8000):
+def run_server(address='localhost', port=8000, tts_controller=None):
     server_address = (address, port)
     httpd = HTTPServer(server_address, Handler)
+    httpd.tts_controller = tts_controller
 
     print(f"Starting httpd server on {address}:{port}")
     httpd.serve_forever()
