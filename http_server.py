@@ -32,15 +32,14 @@ class Handler(BaseHTTPRequestHandler):
                 tts_data = post_data.get('tts_data')
                 if tts_data and len(tts_data) == 1:
                     text = tts_data[0]
-                    self.server.tts_controller.handle_action(tts_action, text)
+                    TTSController.handle_action(tts_action, text)
 
         self._set_headers()
 
 
-def run_server(address='localhost', port=8000, tts_controller=None):
+def run_server(address='localhost', port=8000):
     server_address = (address, port)
     httpd = HTTPServer(server_address, Handler)
-    httpd.tts_controller = tts_controller
 
     print(f"Starting httpd server on {address}:{port}")
     httpd.serve_forever()

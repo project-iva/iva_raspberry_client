@@ -1,23 +1,27 @@
+import io
 from enum import Enum
-
-import pyttsx3
+from pydub import AudioSegment
+from pydub.playback import play
+from gtts import gTTS
 
 
 class TTSController:
     class Action(str, Enum):
         SAY = 'SAY'
 
-    def __init__(self):
-        self.tts_engine = pyttsx3.init()
-
-    def handle_action(self, action: Action, text: str):
+    @staticmethod
+    def handle_action(action: Action, text: str):
         dispatcher = {
-            TTSController.Action.SAY: self.say,
+            TTSController.Action.SAY: TTSController.say,
         }
         # perform action
         dispatcher[action](text)
 
-    def say(self, text: str):
+    @staticmethod
+    def say(text: str):
         print(f'saying "{text}"')
-        self.tts_engine.say(text)
-        self.tts_engine.runAndWait()
+        with io.BytesIO() as data:
+            gTTS(text=text, lang_check=False).write_to_fp(data)
+            data.seek(0)
+            speech = AudioSegment.from_file(data, format="mp3")
+            play(speech)
